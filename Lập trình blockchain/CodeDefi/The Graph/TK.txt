@@ -1,0 +1,8 @@
+1 subgraph có nhiều indexers xử lý và nhiều curators stake vào. Curator stake vào càng sớm càng nhận được nhiều tiền. Điều này thể hiện bằng tỉ lệ share của họ trong The Graph qua bonding curve. 
+Chính vì có nhiều indexers cùng xử lý nên mới chắc chắn dữ liệu lấy được từ các indexer là đúng đắn, có tool check các subgraph để biết indexer nào gian lận. Future họ có thể check dễ dàng hơn với 1 vài queries đặc biệt có tác dụng check
+
+1 subgraph có nhiều curator và stake vào thì nhận được share tượng trưng cho phần trăm tỉ lệ sở hữu trong pool. Các subgraph có nhiều tiền của curator sẽ càng uy tín và mn có xu hướng chọn nó để lấy dữ liệu
+
+delegator chọn subgraph tối ưu cho customer với giá hợp lý vì lợi ích của họ gắn với customer
+
+customer dùng tool nhận data check nếu sai -> báo với arbitrator -> nếu check sai thật -> phạt indexer bằng cách lấy 1 phấn stake của họ gửi cho customer 

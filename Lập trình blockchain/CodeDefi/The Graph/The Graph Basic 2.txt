@@ -1,0 +1,61 @@
+Token GRT tăng gấp 20 lần so với ICO 
+
+Graph là giao thức để tổ chức dữ liệu blockchain khởi đầu là network ethereum giúp cho dev phát triển ứng dụng truy cập vào data của blockchain dễ dàng
+Nó nhận dữ liệu từ blockchain và tái tổ chức lại theo cấu trúc riêng để truy cập dễ dàng hơn. Truy xuất dữ liệu dùng GraphQL là 1 phương thức dễ dàng do facebook phát hành
+Do nó cung dịch vụ truy xuất dữ liệu của blockchain nên không có 1 máy chủ mà họ xây 1 mạng lưới gồm nhiều Graph Node và ai cũng có thể tham gia xây dựng. Vì v GRT có vai trò trả phí cho người xây dựng node và thu phí người sử dụng
+=> cơ chế đơn giản v thôi
+
+Hiện tại có nhiều công cụ có thể lấy thông tin từ blockchain nhưng thường là tập trung.
+Vc truy xuất dữ liệu dùng GraphQL rất phổ biến được facebook, printerest sử dụng.
+Indexer cung cấp dịch vụ indexing và query processing để nhận query fee.
+curator là các subgraph dev, data consumer. Họ chỉ báo hiệu cho indexer rằng những API nào nên được lập chỉ mục để hưởng GRT mà thôi.
+Delegator là cá nhân phụ trách bảo mật băng cách ủy quyền cho indexer. Consumer là người dùng cuối query data được cung từ indexer
+
+The Graph ra đời với mục đích là 1 giao thức lập chỉ mục phi tập trung cho web3. Nó vô cùng cần thiết cho web3. 
+Nó là giao thức lập chỉ mục để truy vấn các mạng như Ethereum và hệ thống tệp liên hành tinh IPFS. Nhờ có nó mà dữ liệu truy cập 1 cách dễ dàng hơn và đặc biệt là bất cứ ai cũng có thể xây dựng or xuất bản các API mở là subgraph. Nó cũng hoàn thành tích hợp với ChainLink giúp dữ liệu sau khi được lập chỉ mục từ API của The Graph sẽ chuyển tiếp đến các smart contract thông qua chain link oracles
+
+Cụ thể, lập chỉ mục là ta cấu trúc, phân loại data để người dùng dễ dàng tìm kiếm, truy vấn hơn. 
+
+Cụ thể, ta là 1 thành viên kỹ thuật của 1 dự án đang xây dựng dapp phục vụ người dùng cuối, ta có thể tạo các subgraph trong The Graph Network để sử dụng.
+VD: các thông tin về số dư các token của 1 số ví có address nào đó => quá ez ta truy cập bằng etherscanf search phát là có. Thế nhưng những thông tin phức tạp hơn phục vụ nghiên cứu or phục vụ mục tiêu trải nghiệm người dùng VD 1 hệ thống tổng hợp thanh khoản các sàn phi tập trung. Khi đó yếu tố chênh giá giao dịch cùng 1 cặp coin ở những sàn khác nhau là 1 thứ rất quan trọng, nhưng làm sao ta có thể truy vấn chuẩn xác, không bị thao túng và nhanh chóng trong thời gian thực. Thêm vào đó dữ liệu trong SM không phải lúc nào cũng sử dụng trực tiếp mà phải thực hiện chuyển đổi. Tức là nếu DApp truy vấn data từ blockchain thì cần phải có 1 cơ sở hạ tầng để xử lý những data đó.
+=> thực tế điều này vẫn có thể làm được mà k dùng The Graph nhưng cực kỳ phức tạp
+
+VD: ta cần xây 1 ứng dụng phi tập trung với chuyên môn giải quyết 1 vấn đề cụ thể thì ta thường không có chuyên môn để truy vấn và xây dựng dữ liệu từ blockchain. Khi đó ta phải thuê nhân lực giải quyết vấn đề truy vấn dữ liệu trên 1 cơ sở hạ tầng tập trung. Nhưng 1 ứng dụng phi tập trung thì dữ liệu không thể nào lại tập trung được
+Kể cả ta sử dụng 1 đơn vị vận hành phi tập trung như Ankr Network để chạy hạ tầng cơ sở dữ liệu thì những dịch vụ như vậy không có sự tối ưu, chính xác về thông tin. Không có ai xác minh cho họ rằng thời gian thực dữ liệu đó là đúng.
+
+Mỗi subgraph xác định smart contract nào cần theo dõi, lắng nghe và cách xử lý dữ liệu khi các sự kiện được kích hoạt trên hợp đồng.
+
+So sanh sự tiện lợi:
+VD: Contract HumanityDAO ta cần theo dõi những owner đề xuất trong nó mà không dùng The Graph thì quy trình là: chạy 1 node đầy đủ bắt từng giao dịch -> check mỗi giao dịch có phải là call tời address contract HumanityDAO không -> nếu có thì check xem phương thức được gọi có phù hợp với 1 trong các data cần lấy không -> từ đó đánh dấu người sender và theo dõi nó.
+VD dùng The Graph cho vấn đề trên: tạo 1 HumanityDAO subgraph trên The Graph Network và gọi khoảng 5 dòng lệnh là có data cần luôn
+=> ta sẽ đi sâu vào cách tạo subgraph, và cách query data
+=> nếu có thể thì đi vào cả cách indexer vận hành và làm gì để trở thành 1 indexer
+
+
+Smart Contract fetch data rất bị hạn chế, nó cần 1 indexing layer là thứ mà graph cung cấp. 
+Không cần phụ thuộc vào các nền tảng phi tập trung, dữ liệu kín và bị thao túng
+
+Họ dùng Ethereum để để xây dựng các decentralized app nhưng các app càng phức tạp thì càng lag vì xử lý dữ liệu cồng kềnh, họ quyết định xây thêm 1 indexing protocol 
+
+1 dapp hoạt động cần: data on-chain, data off-chain, data storage 
+VD: offchain thì các dữ liệu ở ngoài đời thực được đưa vào blockchain dành cho những dapp cần dùng nó. Điều này được thực hiện thông qua oracle
+VD: data storage như filecoin, cea là các dự án offer decentralized data storage. Hiện tại thì phần lớn các dapp dùng lưu data trên ethereum blockchain luôn mà không cần các protocol khác
+Điều đó dẫn đến vấn đề thứ 3 là query data onchain phức tạp như tìm tạo 1 dapp cần dùng đến số lượng land đã được bán trên ethereum của 1 dự án virtual world. Nhưng nhìn lại có vô số marketplace mà người ta lên đó bán land của virtual world tức là ta phải fetch data từ từng market place và add nó vào marketplace của ta. Điều này thực ra không khó vì ethereum open source và ta hoàn toàn có thể làm được. Nhưng nâng cao hơn ta muốn xem selling history của từng marketplace trong 1 khoảng thời gian nào đó cơ vì nhiều người muốn xem các thông tin đó.
+=> Điều này có thể mất vài tiếng để dapp lấy được vì thậm chí smart contract không có hàm getter nào lấy lịch sử trực tiếp như thế, xong vừa lấy được thì các lô đất đó đã bị dịch đi chỗ khác. Và cũng gây khó cho dev để viết code mà query điều đó
+solve: Blockchain -> The Graph -> dApp
+
+Coi The Graph là marketplace của data trên ethereum
+Mỗi data set gọi là 1 subgraph có thể seen bằng graph explorer
+=> vào trang thegraph.com mục Graph Explorer sẽ thấy các dự án đã có subgraph
+
+copy của các subgraph description lưu trên ipfs là data storage layer of filecoin. 
+query bằng GraphQL -> Các node của The Graph Network là indexer sẽ search qua những relevant subgraph to find information cần dùng. indexer sẽ chọn subgraph nào để pull data về dựa vào curation signal. Curation signal được cung bởi curator - những người develop subgraph và đánh giá nó dựa vào chất lượng
+
+Tuy nhiên để hệ thống vận hành trơn tru thì phải có động lực kinh tế
+=> người dùng query phải trả phí do indexer set là DAI or ETH và indexer cũng hưởng lợi từ giá lạm phát của grt token
+=> để đảm bảo indexer không yêu cầu giá quá cao làm các dev dùng graph k muốn dùng nx vì họ tùy ý set giá mà, thì delegator stake grt để chọn indexer nào được chọn để fetch data for developer tối ưu nhất vì họ cũng ăn 1 phần query fee và indexing reward.
+=> để đảm bảo indexer làm việc đúng, họ cũng phải stake grt token
+=> để đảm bảo curator luôn leading indexer data có chất lượng cao nhất, họ cũng phải stake grt trên subgraph bonding curve là 1 curational signal dùng bởi indexer. Nch là cái curve là động lực khiến họ luôn muốn là người nhanh nhất báo cho indexer biết nên dùng subgraph nào vì họ nhận 1 phần phí trả cho indexer. Họ stake grt vào subgraph đó
+Dù curator không bị phạt nếu index sai nhưng họ bị phạt với withdrawal task nếu move stake khỏi subgraph. Điều này tạo động lực họ tìm cái highest quality subgraph vì nếu không thì user k query được thì họ k nhận được querying fee và lost withdrawal task
+3 đối tượng này cũng earn reward từ rebate pool thưởng grt cho người nào đóng góp nhiều nhất vào graph network
+Toàn bộ stake của 3 đối tượng bị lock trong 20 ngày

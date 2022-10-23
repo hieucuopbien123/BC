@@ -1,0 +1,20 @@
+Andre Cronje(bố già DeFi, Yearn, Fantom blockchain) và Daniele(người đứng sau nhiều dự án DeFi 2.0, Wonderland)
+KOL: Key opinion leader là người dẫn dắt dư luận
+
+ve(3,3)(SOLID): thì (3,3) chỉ win-win, mọi người tham gia đều thắng. Còn ve(vote escrow) là ký hiệu token được khóa vào pool. VD người dùng lock CRV vào pool để nhận về veCRV. Ở đây họ nhận lại được phần thưởng tương tự kèm quyền biểu quyết. (3,3) tượng trưng mô hình OlympusDAO, người dùng stake càng nhiều OHM càng tốt.
+=> ve(3,3) khuyến khích người dùng lock token vào pool đồng thời tạo ra mô hình giá trị win-win cho người tham gia
+
+1 dự án ra đời muốn tạo doanh thu thì cần có người dùng trả phí. Nhưng 1 dự án mới ra thì làm gì có ai. Bình thường họ sẽ làm kiểu trả token để khuyến khích người dùng vào. Nhưng token cứ in mãi sẽ giá giảm và lạm phát.
+Cơ chế emission token: tùy vào tỉ lệ cung lưu thông, VD chưa có token nào khóa thì emission rate là 2 triệu. Nếu có 50% token khóa thì emisstion là 1 triệu và 100% thì giảm về 0.
+veCRV thì yêu cầu người dùng khóa token CRV vào càng lâu thì nhận càng nhiều veCRV. Khi đó họ dùng để quản trị, nhận fee giao dịch, boosting phần thưởng. Nhược điểm lại là vốn bị khóa cứng trong giao thức và k thể lưu thông được.
+
+(3,3) là mô hình lý thuyết trò chơi của OlympusDAO. Nó cũng chỉ là khuyến khích người dùng stake càng nhiều OHM càng tốt. Lý do là vì giá trị tối thiểu của giao thức này là giá trị kho bạc mà nó sở hữu. Giá trị token càng cao thì lợi nhuận càng nhiều. Nhược điểm là giá trị OHM mint ra càng nhiều giá càng giảm.
+
+ve(3,3) là sự kết hợp 2 cái đó. Mọi người khóa tài sản vào và ăn phí. Emission rate diễn ra hàng tuần và toàn bộ token phân phối ra thị trường đều trao cho những ai khóa token. Điều này tạo động lực để người dùng khóa token vì khóa nó 1 tuần không unstake là nhận thêm khoảng 5% lượng bỏ vào r.
+Câu hỏi đặt ra là khóa để làm gì? nó sẽ hình thành dưới dạng NFT và được phép bán trên thị trường thứ cấp. Các NFT đó là token bị khóa hay gọi là bán quyền biểu quyết, ta có thể bán trên OpenSea chẳng hạn. Toàn bộ phí gửi hết cho người lock ve(3,3). Việc này khắc phục nhược điểm của CRV khi mà người dùng lock là bị khóa cứng luôn.
+
+Nếu có ai muốn lạm dụng stake token để chiếm quyền kiểm soát thì lượng token trả thưởng cho họ sẽ thấp lại, phòng ngừa rủi ro.
+
+ve(3,3) có 100% lượng token lưu hành thuộc về cộng đồng. K có nhà đầu tư hay private sale này nọ. Người dùng k thể mua SOLID theo hình thức bình thường mà nó phân phối cho 20 giao thức hàng đầu trên Fantom blockchain theo TVL. Nhờ v lượng ví blockchain fantom tăng vọt
+
+ve(3,3) khuyến khích thu phí giao dịch hơn là cung cấp thanh khoảnh. Dự án k cần tạo pool thanh khoản cho tài sản. Những người khóa tài sản vào giao thức sẽ nhận được 100% phí thu được từ các pool mà họ vote cho, ở chiều ngược lại, các pool có thể đặt mức phí cao hơn. 

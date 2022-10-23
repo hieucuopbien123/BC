@@ -1,0 +1,55 @@
+Các nhà phát triển subgraph xác định dữ liệu nào được lập chỉ mục từ blockchain và cách nó lưu trữ và cung cấp qua 1 lớp API.
+Để tạo subgraph ta dùng subgraph studio và graph cli
+VD: tạo 1 subgraph cho smart contract Zora và xuất bản nó, phát signal báo cho indexer indexing cho nó
+
+Subgraph Studio hỗ trợ tạo subgraph trên mainnet và rinkeby, với các blockchain khác ta phải create và deploy vào hosted service
+
+Để dùng yarn: npm install -g yarn
+-> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted
+thì mới hết lỗi -> dùng yarn như bth
+các package trên github nhiều lúc phải install git trong máy mới cài đc, nên nếu k cài được thì install git về máy để có trong environment var. Mỗi lần sửa phải tắt VSC bật lại terminal
+
+Cài theo hướng dẫn trong Subgraph Studio
+Codebase của subgraph bao gồm: 
+subgraph.yaml chứa tệp kê khai subgraph, cấu hình và định nghĩa chính cho 1 subgraph nằm trong subgraph.yaml
+schema.graphql: 1 sơ đồ GraphQL xác định kiểu dữ liệu nào được lưu trữ cho subgraph và cách truy vấn bằng GraphQL
+AssemblyScript Mappings: Mã AssemplyScript chuyển từ dữ kiện trong Ethereum sang các entity xác định để lấy ra => là file mapping.ts
+
+Trong subgraph.yaml có các entity là: 
+dataSource.source là địa chỉ smart contract, các nguồn subgraph và ABI mà ta đang dùng. Địa chỉ là tùy chọn, nếu k có thì nó indexing các sự kiện phù hợp từ mọi contract
+dataSouce.source.startBlock: số block mà nguồn dữ liệu bắt đầu lập chỉ mục. Ta nên dùng block mà smart contract được tạo ra nếu không indexer sẽ phải tìm từ block gốc là genesis rất tốn
+dataSource.mapping.entities: các thực thể mà nguồn dữ liệu ghi vào store. Lược đồ cho mỗi thực thể xđ trong schema.graphql
+dataSources.mapping.abis: 1 or nhiều tệp abi cho contract nguồn cũng như bất kỳ smart contract nào khác mà ta tương tác từ trong mappings
+dataSources.mapping.eventHandlers: liệt kê các sự kiện smart contract mà subgraph này track theo và xử lý định nghĩa trong các handler trong mapping.ts
+
+Ở đây ta lập chỉ mục Token và User trong file schema.graphql
+
+Từ khóa @derivedFrom cho phép 1 field của entity này lấy từ entities khác. Điều này giúp tốc độ nhanh hơn khi đỡ phải query cho cả 2 mà 1 cái có rồi thì cái kia lấy luôn. Đặc biệt là one-to-many relationship thì many sẽ derived from one sẽ tăng performance. 
+Hạn chế lưu 1 array trên 1 entity
+
+Để làm việc với smart contract, event, thực thể dễ dàng và type-safe thì Graph CLI có hàm codegen sinh ra type assemblyscript từ 1 tổ hợp GraphQL schema của subgraph và contract ABI -> chạy lệnh này sẽ sinh ra file script đó
+Chạy xong là ta có thể update configuration trong subgraph.yaml để dùng entities mà ta vừa create
+-> Mở mapping.ts để viết logic handler -> mapping viết bằng assymblyscript rất giống typescript về cú pháp. Mapping cho phép ta đọc và lưu data vào Graph Node.
+Lúc này ta có 2 loại API sẵn sàng sử dụng là Graph TypeScript(@graphprotocol/graph-ts) và mã được tạo từ tệp subgraph bằng lệnh graph codegen
+@graphprotocol/graph-ts cung các API:
+API làm việc với SM, event, block, trans, các giá trị blockchain
+API để tải và lưu thực thể qua lại từ Graph Node store
+API để log các message ở đầu ra GraphNode và Graph Explorer
+API cho phép tải tệp từ IPFS
+JSON API để phân tích cú pháp dữ liệu JSON
+1 crypto API để sử dụng các chức năng mật mã
+Low-level primitives để chuyển qua lại giữa các type khác nhau như Ethereum, JSON, GraphQL, AssemblyScript
+
+Để chạy phải tự cài: npm install @graphprotocol/graph-ts thì mới code được graph bằng typescript
+
+Chú ý tên của graph phải trùng với tên graph tạo ra trong Subgraph Studio convert sang lowercase
+VD lệnh deploy phải là: graph deploy --studio testsubgraph
+
+Sau khi publish nó thì mọi người đều nhìn thấy nhưng chưa đc index. Vì ở đây cái subgraph này test thử nên chả có curator nào vào signal cho nó cả nên ta có thể signal cho subgraph này để trở thành curator, stake vào nó 1 lượng GRT -> khi đó ta có thể view nó trên explorer nhưng sẽ k có ai index cho nó đâu vì đây là testnet mà. Ta sẽ tự trở thành indexer để index cho nó ở phần sau
+
+Lệnh init của ta như sau: graph init --contract-name Token --index-events --product subgraph-studio --from-contract 0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7
+=> param --index-events giúp cho nó tự track mọi event, có thể thấy trong file subgraph.yaml, tham số --product chỉ định ta hợp nhất graph này với subgraph trên phần mềm subgraph studio đã tạo
+
+Quy trình: cài graph-cli -> graph init dự án -> chỉnh sửa schema.graphql cho các entities muốn lấy -> edit file subgraph.yaml muốn bắt sự kiện nào, entities nào -> codegen -> cài graph-ts -> code handler mapping.ts -> build -> deploy -> public -> signal 
+
+tham số --contract-name Token là ta gom tất cả contract tại address nào thành 1 biến Token dùng trong code mà tương tác với contract đó chứ kp bản thân contract có 1 contract tên là Token đâu

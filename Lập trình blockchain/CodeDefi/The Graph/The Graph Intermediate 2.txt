@@ -1,0 +1,55 @@
+Đứng ở phía customer, dùng GraphQL để query data phổ biến đã có sẵn các subgraph trên The Graph
+
+REST API ->  GET/users  <- Frontend
+             GET/projects
+             GET/teams
+Nhưng GraphQL chỉ cần 1 single endpoint. Với 1 single query, ta có thể combine data từ nhiều routes:
+API of Graph ->  POST/  <--GraphQL query--  Front end
+=> chú ý nó luôn là post request
+
+Cơ chế:
+  Blockchain                      Graph Node(The Graph)
+smartcontracts --events--> subgraphs -> database -> API -> consumer
+
+Subgraph define data nào được take from blockchain, thường thì là event
+Bất cứ ai cũng có thể tạo subgraph: ta phải tải ứng dụng Graph Node là 1 open source viết bằng rust available trên github. Ta có thể tự run graph node đó và deploy my subgraph trên nó. Sau đó ta phải duy trì cái node này online để mọi người có thể dùng subgraph của ta. Or ta có thể deploy subgraph của ta lên 1 hosted graph node khác run bởi company của The Graph
+
+Ở VD này ta chỉ sử dụng API có sẵn của The Graph và query nó bằng NodeJS.
+Ta dùng online playground của The Graph: vào Graph Explorer và chọn graph của uniswap r mở playground.
+
+Cột trái là GraphQL, giữa là kết quả, phải là các schema mà ta có tức là các entities mà ta có thể query. Ấn vào schema sẽ hiển thị các field mà ta có thể query trong 1 schema. Hiển thị tên field và type of field. 1 vài field phức tạp ta click tiếp sẽ hiển thị thêm các field bên trong field đó
+
+Để query GraphQL, ta dùng theo các schema bên phải là được. Trường to nhất đầu tiên luôn là số nhiều viết thường của các schema. Xong cứ dựa vào schema để viết thôi
+Ta để ý có nhiều subgraph cùng 1 nền tảng như Uniswap, NN là bởi vì có nhiều người tạo nhiều subgraph khác nhau cùng 1 dự án vì mỗi người có các trường query có thể khác nhau và họ cạnh tranh trở thành 1 subgraph tốt nhất. Các subgraph mà trạng thái indexing chưa xong thì ta k thể query
+
+Khi dùng mặc định thì nó query 100 item đầu tiên nhưng ta hoàn toàn có thể thay đổi nó bằng tham số đầu tiên. VD:
+{
+  pools(
+    where:{# cái này là để filter
+      volumeUSD_gt:"10000"
+    }
+    first:10,
+    skip:1, 
+    orderBy:volumeUSD
+    orderDirection: desc
+  ){
+    token0{
+      symbol
+    }
+    token1{
+      symbol
+    }
+    volumeUSD
+  }
+} trong 1 uniswap v3 subgraph nào đó
+
+Trong mỗi subgraph luôn kèm link github mà ta có thể vào file yaml của nó để xem subgraph đó được build như thế nào, để hiểu các schema có vai trò gì
+Nhìn vào code biết được source data lấy từ đâu, nó track những event nào. Mỗi event nó bắt nó sẽ gửi vào handler xử lý. Ở trong phần source/mapping sẽ là các file typescript chứa các handler
+-> ta đi vào tạo subgraph sau
+
+Dùng The Graph for Nodejs app ta chỉ query bình thường bằng nodejs axios mà thôi
+
+Bản test thử của the graph là hosted service có các nền tảng có sẵn để ta test free. Ở đây ta lấy url binh thường. Còn trên Graph Explorer, ta muốn dùng các graph ở đây thì phải có GRT trong tài khoản để đăng ký API key từ đó dùng để query subgraph.
+Thực tế phần tiền GRT phải trả là từ DApp chứ kp end user vì user cuối đâu phải lúc nào cũng có GRT để trả mà dùng DApp đâu
+
+Để faucet GRT -> vào group discord -> hoàn thành captcha -> lấy role testnet indexer -> hiện channel testnet faucet -> vào gửi !grt <address> -> import token vào metamask là có 100000 GRT

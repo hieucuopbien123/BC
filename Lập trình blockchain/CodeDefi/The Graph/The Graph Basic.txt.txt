@@ -1,0 +1,53 @@
+The Graph là giao thức phi tập trung cung cấp dịch vụ thống kê, lập chỉ mục và truy vấn dữ liệu từ blockchain đến cho người dùng. Điểm đặc biệt là cho phép truy vấn dữ liệu khó truy vấn trực tiếp
+Vấn đề: các dự án như Uniswap hay NFT như Bored Ape Yacht Club lưu data trên Ethereum có việc đọc data ngoài dữ liệu cơ bản rất khó. VD Bored Ape Yacht Club thì ta cần lấy thông tin chỉ cần gọi hàm getter trên smart contract sẽ cho phép lấy thông tin owner của 1 Ape vì nó lập trình trực tiếp vào smart contract. Nhưng nhu cầu là họ muốn thao tác nâng cao hơn như tổng hợp, search, check các relation, filter data. VD họ truy vấn tập hợp Ape thuộc 1 địa chỉ nhất định hoặc lọc 1 trong các đặc điểm của 1 ape thì smart contract solidity không thể tạo mọi hàm getter làm việc đó được.
+
+Các thuộc tính của blockchain như tổ chức lại chuỗi(khi conflict chọn cái nhiều cumulative energy hơn với bitcoin) hay truy gốc các khối làm phức tạp quá trình tổng hợp chuỗi dữ liệu. The Graph trích xuất, thống kê, sàng lọc, sắp xếp dữ liệu từ các giao thức khác nhau cho phép người dùng dễ dàng truy cập vào đó VD dev truy xuất dữ liệu như giá token và sử dụng vào ứng dụng của họ thông qua The Graph.
+Đồng thời phải giải quyết vấn đề nhà cung cấp nền tảng giao dịch thao túng dữ liệu như báo giá cao hơn trên website để hưởng lợi từ phần chênh lệch
+=> The graph giải quyết bằng cách tạo ra 1 giao thức lập chỉ mục phi tập trung và cho phép user truy vấn data từ blockchain thông qua subgraph. Mỗi subgraph là 1 API mở để dev dùng ngông ngữ GraphQL để truy vấn dữ liệu blockchain thông qua cái subgraph đó vì nó là cái theo dõi data ta cần lấy trên blockchain mà.
+
+The graph hoạt động đơn giản nhờ cách tìm hiểu thông tin và cách lập chỉ mục dữ liệu. Điều này được xđ dựa trên subgraph manifest(bản kê lệnh subgraph). Trong bản kê lệnh, The Graph xđ smart contract và các event đáng lưu ý của sm đó và cả cách lập bản đồ dữ kiện với thông tin được lưu trong csdl của hệ thống.
+VD: 1 dev viết xong 1 bản mô tả của subgraph -> họ dùng Graph CLI để lưu nó vào hệ thống lưu trữ IPFS -> và thuật toán của The Graph sẽ bắt đầu lập chỉ mục dữ liệu cho subgraph đó
+
+Quá trình: DApp sendTransaction đổi data cua ethereum -> smart contract thực thi và phát ra event -> Graph Node liên tục quét trên ethereum để tìm ra block mới và dữ liệu cho subgraph của nhà phát triển ứng dụng -> VD Graph Node tìm thấy các events ethereum cho subgraph đó trong các khối thì sẽ chạy tiếp trình xử lý mapping - module WASM tạo ra or cập nhập các data và Graph Node lưu lại tương đương các sk trên ethereum -> 1 dapp khác truy vấn Graph Node về dữ liệu được lập chỉ mục bằng việc dùng GraphQL API -> Graph Node lần lượt biên dịch các truy vấn GraphQL đó thành các truy vấn về kho dữ liệu cơ sở của nó. Mục đích là trích xuất dữ liệu, dùng khả năng lập chỉ mục của kho lưu trữ -> thế là có dữ liệu, dapp sẽ hiển thị ra cho người dùng với giao diện thân thiện, nơi mà họ dùng để thực hiện tiếp các giao dịch mới trên ethereum
+
+GraphQL cũng chỉ là 1 ngôn ngữ truy vấn API mà thôi
+
+=> Tổng kết thì The Graph là 1 giao thức sắp xếp cơ cấu lại data blockchain và giúp các thông tin này truy cập dễ hơn mà thôi. Nó cung cấp dữ liệu cho nhiều ứng dụng defi và web3
+
+Bất cứ ai cũng có thể xây dựng và xuất bản các subgraph - các API mở mà các ứng dụng có thể truy vấn dữ liệu từ nó bằng GraphQL. Nó như là 1 google của blockchain vậy vì có những tài liệu trên mạng nhưng giả sử k có google thì ta truy cập các tài liệu đó rất khó và bị hạn chế nhiều, khi có google ta search phát được luôn thì The Graph có ích như v. Thay vì ta gõ search, ở đây ta truy vấn GraphQL
+
+The Graph hiện tại đang xử lý hơn 4 tỷ truy vấn hàng tháng cho các ứng dụng như Uniswap, CoinGecko, Synthetix bao gồm trích xuất data như giá token, khối lượng giao dịch, tính thanh khoản
+
+=> vẫn chưa rõ đánh chỉ mục nghĩa là sao
+
+Mạng lưới gồm các Node được trả tiền để giữ cho dịch vụ hoạt động. The Graph cũng cho phép bất kỳ người dùng tích cực đóng góp vào mạng lưới có quyền tham gia vào cơ chế kiếm thu nhập như các provider thay vì trao quyền đó cho những đơn vị độc quyền như hiện nay. 
+
+Ưu điểm: The Graph cho phép người dùng truy vấn dữ liệu từ các blockchain như ethereum và hệ thống lưu trữ phi tập trung IPFS bằng cách nhận truy vấn -> thu thập, phân tích, tổng hợp dữ liệu mà không có tương tác với bên thứ 3; bất cứ ai cũng tham gia tạo subgraph; Token GRT với các đối tượng như Indexer, Curator, Delegator thì:
+Indexer: sau khi stake GRT vào hệ thống sẽ phụ trách vận hành các Node của The Graph và kiếm tiền bất cứ khi nào truy vấn được xử lý
+Curator: quyết định thông tin nào cần để lập chỉ mục và sẽ được trả tiền cho hđ đó
+Delegator: nhận được 1 phần thu nhập từ người lập chỉ mục mà họ ủy thác cho dù k chạy các node
+=> vai trò 3 thằng này học sau
+
+Đội ngũ chuyên nghiệp, backer tốt....
+
+Indexer đồng bộ hóa các subgraph mới và đưa ra tham số phù hợp với subgraph đó. 
+The Grah hoạt động trên các đối tác thuộc mạng lưới của The Graph và indexer cùng delegator được nhận phí truy vấn vì họ đóng góp cho nền tảng
+GRT là token dùng giao thức DPoS(Delegated Proof of stake). 3 người indexer, curator, delegator phải stake GRT vào nhằm đk cung cấp các dịch vụ lập chỉ mục và quản lý mạng lưới The Graph và nhận thưởng. GRT đã stake cũng để bảo hiểm nếu Indexer có dấu hiệu bất thường khi cung cấp dữ liệu sẽ trừ rất nặng vào khoản đã stake
+GRT là token ERC20, số lượng GRT staked và số lượng job 3 đối tượng làm tỉ lệ thuận với lợi nhuận
+
+Phân tích 4 đối tượng:
+Indexer người lập chỉ mục: cũng chỉ là người vận hành các node trong mạng lưới, họ phải có trình độ kỹ thuật cao, stake GRT để đk dịch vụ lập chỉ mục và xử lý truy vấn và nhận lại GRT là phí truy vấn là thưởng cho họ. Họ là người xây dựng The Graph Node giúp tăng tốc việc truy cập dữ liệu trên The Graph Networks
+Curator người phụ trách: là những người giúp phát triển subgraph có trình độ kỹ thuật ở mức trung bình. Khi người dùng dữ liệu or thành viên nào đó báo với Indexer rằng API nào nên được lập chỉ mục trong mạng The Graph -> Curator sẽ gửi GRT vào 1 đường cong liên kết bonding curve để báo hiệu rằng 1 subgraph cụ thể cần được phát triển -> Curator nhận phí truy vấn dựa trên các subgraph mà họ đã báo và đặt thưởng khuyển khích cho các nguồn dữ liệu chất lượng cao nhất -> Curator sẽ chịu trách nghiệm quản lý các subgraph và nạp GRT vào hệ thống thông qua ứng dụng Graph Explorer. Họ dùng GRT để báo hiệu subgraph nào có giá trị để đưa vào Graph Node
+Quy trình này thực hiện trên bonding curve nên Curator càng báo hiệu sớm thì tỉ lệ phí truy vấn họ kiếm được càng lớn và tương đương với lượng GRT họ nạp
+Delegator người ủy quyền: họ muốn đóng gói vào việc bảo mật mạng lưới nhưng lại k muốn chạy bất cứ node nào của The Graph. Những delegator sẽ đóng gop bằng cách ủy thác GRT cho indexer nên chả cần có chuyên môn về kỹ thuật. Họ sẽ chọn indexer dựa trên hiệu suất làm việc của họ thông qua các thông số như phí truy vấn, các lần phạt trọng quá khứ, thời gian hoạt động, tỉ lệ phân chia chi phí và thưởng. Delegator sẽ thực hiện ủy quyền or k ủy quyền GRT cho indexer thông qua ứng dụng phi tập trung Graph Explorer và họ kiếm được 1 phần phí truy vấn và phần thưởng lập chỉ mục là token GRT. Họ đầu tư GRT vào indexer và chia fee cùng indexer
+Consumer khách hàng: truy vấn các subgraph và trả phí cho indexer, curator, delegator. Đó là dev or các dự án có nhu cầu sử dụng và trả phí truy vấn dữ liệu, như họ sẽ thao tác trên AWS hoặc các dịch vũ đám mây khác
+
+GRT stake bị khóa trong 1 khoảng thời gian, indexer gây hại or đánh chỉ mục sai sẽ bị phạt, curator và delegator sẽ chịu khoản thuế tiền gửi để hạn chế vc ra qđ kém hiệu quả phá hoại tính bền vững của hệ thống. Curator cũng nhận phí thấp hơn nếu họ quản lý trên 1 subgraph chất lượng kém
+
+Graph xử lý dữ liệu trên chuỗi còn oracle tổng hợp và xử lý dữ liệu ngoài chuỗi
+
+Indexer kiếm tiền từ việc cung cấp thông tin cho các truy vấn từ subgraph chẳng hạn như cung cấp dữ liệu thị trường của uniswap trên uniswap.info
+=> giá của truy vấn sẽ lập bởi indexer và thay đổi dựa trên chi phí để lập chỉ mục subgraph
+
+The Graph dùng gateway cho phép người dùng liên kết với mạng lưới và thanh toán chi phí truy vấn chuyển đến indexer sau khi thống nhất. The Graph chạy hàng loạt Gateway, bất cứ đội ngũ phát triển nào cũng có thể vận hành các gateway của riêng mình
+

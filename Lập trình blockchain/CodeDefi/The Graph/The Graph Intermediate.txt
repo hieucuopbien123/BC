@@ -1,0 +1,24 @@
+Tại sao lại gọi là indexing? Vd ta search 1 thứ gì đó trong 1 cuốn sách, việc search bừa và search theo mục lục sẽ có tốc độ khác nhau. Lập chỉ mục index chỉ công việc sắp xếp, phân loại, tổng hợp như v. VD sắp xếp sẵn theo bảng chữ cái chẳng hạn thì như v việc query data sẽ ez hơn. Vd trong database ta dùng SQL để query thì việc indexing sẽ giúp SQL query dễ dàng hơn
+
+Trong blockchain ta đang k xét các data lấy dễ dàng bởi smart contract mà các data phức tạp thì chỉ có các lấy thẳng từ blockchain nhưng nó cũng như là search trong 1 cuốn sách dài vô tận vậy. Các khối nối với nhau chứa hàng trăm transaction ngẫu nhiên và ta phải tìm từng transaction 1 để search cái thông tin của ta
+Điều này là quá occho nên nhiều nền tảng VD etherscan là 1 ví dụ 1 tổ chức tập trung. Họ đơn giản lấy toàn bộ data trên blockchain -> nhét vào database của họ -> lập 1 chỉ mục indexing 1 bảng query -> người dùng query nó bằng cách gõ address vào thanh bar để tìm transaction tương ứng
+=> Nó là 1 ví dụ tương tự The Graph nhưng nó là tập trung tức người dùng phải tin tưởng tổ chức etherscan không làm giả dữ liệu nhưng 1 ứng dụng phi tập trung không thể lấy data tập trung được. Thêm vào đó là etherscan chi search được theo địa chỉ và 1 vài hình thức khác trong khi blockchain rất đa dạng chứ k chỉ như v. Nếu so với graph thì search địa chỉ của etherscan chỉ được coi như 1 subgraph nhỏ mà thôi. 
+
+Các công ty đương nhiên là k muốn tin tưởng bất cứ 1 api nào bên ngoài mà họ chỉ muốn trust their own service => The Graph chính là decentralized query protocol for blockchain giải quyết vấn đề. Nhờ có nó mà ta có thể build 1 ứng dụng lấy data bên ngoài cũng như xử lý data bên trong phi tập trung hoàn toàn không có bất cứ ai can thiệp được
+=> ta có thể query different network như ethereum, ipfs bằng GraphQL VD ta muốn tìm trường nào của dữ liệu nào.
+1 dapp có thể dùng 1 or nhiều subgraph để lấy dữ liệu. 1 subgraph cũng có thể chưa nhiều subgraph khác để hợp nhất thành 1 data set mà dapp dùng. 
+Graph cung ứng dụng Explorer cung cấp api of a lot of most popular protocol như uniswap, compound, aave,...
+
+indexer lập chỉ mục cho subgraph. Nhiều indexer cạnh tranh với nhau về giá cả và chất lượng của indexer như kiểu 1 marketplace cung bởi các indexer bán data mà các consumer vào mua v
+curator có thể là các dev tạo ra subgraph và yêu cầu indexer đánh chỉ mục cho subgraph của họ or là end-user trả tiền để yêu cầu subgraph của ai đó cần được index để họ dùng => nhận fee dựa vào subgraph họ chỉ định có được query nhiều như nào
+
+Sự phối hợp:
+VD: 1 dự án exchange launch trên mainnet -> đội ngũ phát triển muốn những người khác dùng GraphQL truy cập vào thông tin của exchange này -> 1 curator nào đó or dev của dự án ban đầu tạo ra 1 subgraph -> thấy có subgraph mới, curator signal rằng subgraph mới đáng để indexing
+  TH1: dự án phát triển mạnh -> curator stake GRT vào subgraph và yêu cầu indexer index nó
+  TH2: dự án phát triển kém, ít người muốn query subgraph của nó -> đội ngũ dự án tự stake grt để trở thành curator và tự trở thành curator cho subgraph của chính họ
+-> indexer vào index cho cái subgraph đó, việc index có thể mất vài ngày tùy vào dữ liệu index nhiều hay không -> consumer query subgraph trả grt cho indexer -> query engine xác định indexer nào xử lý cái query này để nhận phí. 
+Nhưng để đơn giản họ làm 1 payment channel giữa consumer và indexer để consumer trả tiền cho indexer -> nếu indexer trả lại thông tin sai sẽ diễn ra dispute process 
+
+Google cũng indexing website để cho các web hay lên top đó
+
+IPFS là file sharing system còn blockchain là sharing ledger. Nó khá giống nhau nhưng IPFS chia sẻ file ngang hàng không được coi là 1 blockchain hoàn chỉnh

@@ -1,0 +1,17 @@
+Có temporary url mà ta có thể dùng để query ngay lập tức
+
+Để trở thành indexer cần nhiều điều kiện về phần cứng và kỹ thuật ta k làm
+
+Phần hosted service là centralized rồi
+
+Ta đã hiểu The Graph là gì về lý thuyết, biết cách query online, query trong Nodejs, biết cách tạo subgraph và trở thành curator trong decentralized explorer của The Graph rồi => còn rất nhiều thứ như dùng hosted device, thử với custom contract của ta, xây dựng subgraph theo nhiều kiểu phức tạp hơn
+
+Để cài trong hosted service ta làm như bình thường rất ez, nó cũng có sẵn graph-ts trong package.json mà ta chỉ cần npm install để tự động cài về chứ kp làm như cái trước
+Để deploy ta phải sign in link github vào hosted service của The Graph -> và dùng cú pháp theo hướng dẫn. Tên graph phải là hieucuopbien123/zoranftethworkshop tức là <Github name>/<Subgraph name>
+=> Khi deploy như v nó sẽ nằm trong phần hosted service và được sync(hay gọi là indexing khi dùng decentralized ấy) 1 cách tự động bởi The Graph => tức là ta có thể tự tạo The Graph dùng cho dự án mình như v => Nếu k có token GRT trên mainnet thì dùng như này luôn
+Trong quá trình sync là nó đang index từ block ta set cho đến block mới nhất để lấy event và sau đó nó sẽ tự bắt tiếp event theo thời gian thực và cung cho ta thông qua API
+graph init --from-contract 0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7 --network mainnet --contract-name Token --index-events với tên subgraph là hieucuopbien123/zoranftethworkshop
+Các flags trong command là các thứ ta định nghĩa trước, nếu k có thì về sau cũng phải điền. Ta phải có link file abi nhé nếu chưa publish code
+VD hosted services: graph init --from-contract <address> --network <network> --abi <link file> git/subgraphname <tên folder> => tạo subgraph từ 1 contract có sẵn
+graph init --from-example git/subgraphname <tên folder> => tạo subgraph từ 1 subgraph mẫu của Graph team
+

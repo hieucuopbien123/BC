@@ -1,0 +1,29 @@
+Blockchain:
+Cấp bậc các module: Blockchain cơ bản < Defi < Lập trình blockchain
+
+
+## Blockchain cơ bản
+# Bitcoin
+# Ethereum
+# Solana
+# TRON
+# Crosschain
+# Layer2
+# Sidechain
+
+
+## Defi
+# Defi Basic
+# Các dự án
+
+
+## Lập trình blockchain
+# Solidity
+# Vyper
+# Tool
+
+
+
+
+
+

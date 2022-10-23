@@ -1,0 +1,31 @@
+Khi trade 2 đồng stable coin trên Uniswap VD 1,000,000 DAI ta chỉ nhận lại 975,436 USDC trong khi về lý thuyết 2 đồng coin giá ngang nhau. Khi đó lựa chọn tốt hơn là trade trên curve. Nó giúp trade 2 đồng có giá ngang nhau với minimal loss.
+NN vì Uniswap càng trade nhiều thì loss càng nhiều như trên ta trade 1 triệu DAI lận. Nhưng trên curve thì ta có thể nhận lại y nguyên thậm chí là nhiều hơn 1 triệu USDC. Trên đồ thị của uniswap nó cong còn trên Curve nó sát hơn vào 2 trục và phần nằm giữa của nó gần như 1 đường chéo x+y=const dẫn đến nếu ta trade stable coin trên cùng chéo đó thì số tiền nhận ra coi như bằng số tiền nhận vào luôn. Đương nhiên phương trình của nó cũng khác
+
+Tiếp tục fork mainnet test các contract trên curve hiện tại
+
+Trong Uniswap có rất nhiều pool, mỗi pool chứa 1 group các token ngang giá. VD 3pool là pool chứa 3 token DAI, USDC, USDT
+
+Khi chạy truffle chỉ cần trong máy có compiler của Vyper rồi thì nó tự compile vyper dù ta k set nó trong config
+
+Để compile VD ở Th này:
+-> npm install bn.js => chứ kp bn
+-> ganache-cli --fork https://mainnet.infura.io/v3/334b94e6fd54411ea35f426ecaf0099d --unlock 0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936f0bE --networkId 999 => ở đây ta unlock USDC_WHALE
+-> npx truffle test ./test/test-curve-exchange.js --network mainnet_fork => là chạy test hàm này
+
+Cơ chế: Ta muốn trade 2 đồng stable coin với giá ngang nhau 1 DAI ra 1 USDC thì dùng x+y=C với C là tổng số coin trong pool. VD: x+y=100 thì đổi 1 DAI sẽ ra đúng 1 USDC. 
+Nhưng thực tế có sự chênh lệch VD 1 DAI = 1.01$ và 1 USDC = 0.99$ thì người ta sẽ đổi hết lấy đồng có giá trị cao hơn và chẳng mấy chốc pool sẽ hết đồng có giá trị cao
+Bình thường nhu cầu đổi 2 đồng này là như nhau. Nên để tránh tình trạng đổi như trên, họ dùng hết hợp x+y=C ở đoạn giữa và 2 mép sẽ dùng xy=D để tránh người dùng chơi đều như v. Còn thông thường đổi sẽ rơi vào giữa, còn ai đổi hết đồng lớn hơn thì k được vì tỉ giá đắt dần. Họ sẽ tạo ra 1 phương trình đồ thị giống uniswap nhưng đoạn giữa dài ra và xấp xỉ đường cheo x+y=C
+Để làm được điều đó: x+y=D; xy=(D/2)^2; => x+y+xy=D+(D/2)^2 => tuy nhiên đồ thị vẫn giống uniswap, họ phải tăng phần x+y=D lên bằng cách nhân thêm X
+-> X(x+y)+xy=XD+(D/2)^2 -> X = 0 thì đồ thị còn xy=(D/2)^2 hệt uniswap -> X=vô cực dương thì X(x+y)=XD còn phần nhân nhỏ bỏ đi sẽ hệt như đường thẳng -> chỉnh X tăng dần làm graph sẽ phẳng dần đổi từ uniswap về constant sum
+-> Ta muốn là khi X nhỏ thì nó giống như uniswap nhưng nếu x+y lớn thì lại k giống uniswap nx -> fix bằng cách ta lấy riêng nó ra X(x+y)=XD => chuẩn hóa thành X(x+y)/D=XD -> XD(x+y)=X*D^2 thế ngược lại DX(x+y)+xy=XD^2+(D/2)^2
+=> Đặt X = Axy/(D/2)^2 -> thế vào -> nhân D/xy 2 vế -> rút gọn thành PT cuối là A*2^2(x+y)+D=AD*2^2+(D/2)^2*D/xy => là PT cuối trong whitepaper -> vẽ nó ra được graph như ý
+A = 0 -> xy=K
+A = vô cực lớn -> x+y=C
+=> Để lập được PT đó cần giỏi về xử lý toán học
+
+
+Để add liquidity: vào curve.fi rồi addLiquidity và nhận về LP token. Ta cung vào 1 lượng như nhau các stable coin thì cung lượng stable coin nào có balance càng ít trong pool thì sẽ càng nhận được nhiều LP token hơn. Lượng LP token thể hiện phần trăm sở hữu trong pool từng loại coin. Nó cũng cho phép ta tùy chọn chỉ rút hết 1 loại coin nào cũng được
+
+
+
+

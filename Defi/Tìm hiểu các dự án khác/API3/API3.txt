@@ -1,0 +1,17 @@
+API3(token API3) là nền tảng oracle cho phép các DApp truy cập vào dữ liệu và dịch vụ thế giới thực thông qua API, hay gọi là dAPI.
+API3 quản lý bởi tổ chức tự trị phi tập trung DAO, gọi là API3 DAO nên open source và minh bạch
+
+Thông thường API giúp ứng dụng và thư viện kết nối với nhau nhằm trao đổi dữ liệu. Nhưng để đưa các dữ liệu này vào blockchain là không thể vì API bình thường k hoạt động với smart contract. Điều này khiến cho blockchain là 1 mạng lưới khác nhưng cô lập với mạng lưới internet bình thường ta hay dùng v. API3 giải quyết vấn đề đó.
+
+API3 là token ethereum ERC20 giúp API truyền thống kết nối với hệ sinh thái blockchain. API3 dùng để quản trị API3 DAO, vote các upgrade.
+
+Cơ chế: Nó xây dựng bằng cách kết hợp nhiều oracle node do nhà cung cấp vận hành thành nguồn cấp dữ liệu tổng hợp, k cần bên thứ 3
+Thông thường ở các loại oracle trước đó có cơ chế kiểu nhét thông tin vào oracle và lấy thông qua các node của bên thứ 3 trung gian. Bởi vì các nhà cung cấp API gặp nhiều rào cản khi tự vận hành 1 oracle node riêng. Bởi vì các công ty quản lý dữ liệu không quen thuộc với blockchain, họ không có kiến thức về mảng này và cũng chẳng cần phải làm vậy. Oracle node vận hành tốn tài nguyên và chi phí, nhân lực. Vận hành oracle node bình thường sẽ phải thanh toán phí gas cho mạng lưới và giao dịch tiền điện tử rắc rối. 
+=> API3 loại bỏ bên trung gian bằng cách sử dụng luôn Oracle Node của bên thứ nhất(là nhà cung cấp dữ liệu gốc). Họ cho ra phần mền Airnode để nhà cung cấp API chuyển API của họ thành dAPI và mn vào thẳng nguồn trực tiếp. Như vậy sẽ phi tập trung hơn bản cũ. Lưu ý điều này khác với kiểu của The Graph nhé. Ở đây ta vẫn dùng Oracle nhưng bỏ node đi thôi. Cơ chế của Oracle là người dùng tổng hợp thông tin từ nhiều node để cho ra kết quả cuối đúng nhất khác với Graph là chọn 1 subgraph để lấy thông tin vì đã tin tưởng subgraph là đã phi tập trung sẵn r.
+Với phần mềm Airnode thì các nhà cung API có thể dễ dàng triển khai, ít bảo trì và không cần nắm rõ kiển thức về blockchain. Nó cho toàn quyền nhà cung cấp API có thể chạy oracle miễn phí nếu thích và chỉ trả phí nếu họ bắt đầu tọa ra doanh thu. Airnode chính là mấu chốt, nó là 1 node oracle k có máy chủ thiết kế dành riêng cho API provider. Các nhà cung node cx kp trả phí mà người dùng trả hết
+
+Điểm nổi bật:
+Chính là việc cung cấp lấy dữ liệu và dịch vụ trực tiếp từ nhà cung cấp API. Tránh được tình trạng nhiều node trung gian liên kết với nhau cung ra kết quả sai
+Bỏ qua node trung gian giúp tiết kiệm chi phí vì bình thường trong các dự án họ thường xử lý vấn đề khi có 1 khâu nào đó là tập trung bằng cách chi trả phần thưởng rất cao so với việc gian lận, kiểu stake token vào chẳng hạn. Nhưng nhờ kiểu này thì đã xử lý khâu trung gian có nguy cơ tập trung rồi
+Tuy API3 xử lý vấn đề đó thì người dùng k cần stake token vào để trở thành node nhưng cơ chế staking khác trong API3 có mục đích bảo hiểm cho người dùng. Nếu gặp rủi ro họ sẽ đền bù bằng token API3, ngược lại trong TH bình thường thuận lợi, người dùng stake API3 sẽ được profit.
+

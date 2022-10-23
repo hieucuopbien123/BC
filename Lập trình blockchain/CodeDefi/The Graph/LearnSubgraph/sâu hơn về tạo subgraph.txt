@@ -1,0 +1,360 @@
+subgraph.yaml: gọi là subgraph manifest
+description là mô tả về Graph, là thứ sẽ hiển thị bởi Graph Explorer khi subgraph được deployed
+repository: chứ repo's url nơi subgraph manifest được located. URL cũng display bởi Graph Explorer
+dataSources.source: xác định thông tin contract và abi. address là optional, nhưng nếu k có thì subgraph sẽ index event từ mọi contract sẽ rất lâu
+dataSources.mapping.entities: entity xđ ở file graphql
+dataSources.mapping.abis:
+dataSources.mapping.eventHandler: bắt event nào và sẽ xử lý gì
+dataSources.mapping.callHandler: entry này cho phép ta list mọi function of smart contract mà subgraph sẽ tương tác với nó. Cũng dùng nó cho handler trong mapping.ts chuyển đổi input và output of funtion thành entities lưu trong store. Ta xử lý hết
+dataSource.mapping.blockHandlers: xđ blocks mà subgraph sẽ tương tác với và handle trong file mapping.ts khi block đó thêm vào chain. Block handler sẽ run với mọi block nếu ta k specific 1 cái filter cho nó. Trong VD mới nhất, ta dùng filter kind: call tức là handler này sẽ chạy chỉ khi block chứa ít nhất 1 call tới smart contract đó
+=> có thể tương tác với nhiều contract cùng 1 lúc bằng cách trong dataSource ta khai báo nhiều cục như v bên dưới. VD:
+dataSource:
+  - kind: ethereum/contract
+    ... đây là 1 contract...
+  - kind: ethereum/contract
+    ... contract tiếp theo...
+=> thứ tự trigger các handler 1 datasource trong 1 block: event và call trigger(là cái eventHandler và callHandler được gọi đó) theo thứ tự block. Nếu trong cùng 1 transaction vừa có event và call trigger thì xử lý event trước, call sau. Sau event và call trigger, block trigger được run sau đó theo thứ tự defined trong file này
+=> dùng abi đúng phiên bản của contract, nếu k sẽ k chạy. có thể lấy thẳng contract về rồi compile từ truffle ra abi cho chuẩn. Nếu dùng trên etherscan cũng ok nhưng có thể k đáng tin.
+
+schema.graphql: xác định lưu data nào cho người dùng lấy và cách nó query bằng GraphQL
+Dấu ! ở sau mỗi type là bắt buộc phải định nghĩa entities đó ở trong file mapping, ngược lại là optinal vì đâu phải entities nào cũng lấy được. 
+ID! là type buộc có và nó là type string bth thôi, unique
+Bytes: Byte array, bd hex string thg dùng cho hash và address
+String, Boolean
+Int: int size 32 bytes
+BigInt: large int dùng cho uint32, uint64,..., uint256. các type < uint32 như int32, uint24, int8 sẽ dùng như Int
+BigDecimal: số thập phân có độ chính xác cao, số mũ trải từ -6143 tới 6144 làm tròn tới 34 chữ số có nghĩa
+enum TokenStatus {
+  Original Owner
+  SecondOwner
+  ThirdOwner
+} => có thể định nghĩa enum trong schema
+VD sử dụng enum trong 1 entity:
+type Token @entity {
+  id: ID!
+  name: String!
+  tokenStatus: TokenStatus!
+}
+Relationship:
+- 1 to 1: 
+type Transaction @entity {
+  id: ID!
+  transactionReceipt: TransactionReceipt
+}
+type TransactionReceipt @entity {
+  id: ID!
+  transaction: Transaction
+}
+-1 to many: => store oneside to increase performance
+type Token @entity {
+  id: ID!
+}
+type TokenBalance @entity {
+  id: ID!
+  amount: Int!
+  token: Token!
+}
+ReserveLookup cũng chỉ là 1 thuộc tính cái này lây 1 thuộc tính cái kia:
+type Token @entity {
+  id: ID!
+  tokenBalances: [TokenBalance!]! @derivedFrom(field: "token")
+}
+type TokenBalance @entity {
+  id: ID!
+  amount: Int!
+  token: Token!
+}
+=> ý là Token sẽ tự lấy trường tokenBalances từ TokenBalance->token
+=> có derivedFrom là lấy từ trường nào, k có là lấy cả. [] tức là khai báo 1 mảng, ở đây tokenBalances là 1 mảng các type [TokenBalance]. 
+=> Khi nào Token được sinh ra thì có id mới. Khi nào TokenBalance được sinh ra thì 1 entity mới vói id, amount mới(nếu chưa được sinh ra trước đó) và trường token của nó lại update id, k cần update tokenBalances vì lại recursive chính nó, đồng thời 1 entity Token mới cũng sinh ra với id đó(nếu chưa được sinh ra) với tokenBalances là 1 mảng sẽ add cái TokenBalance vào 
+
+-Many to many: 1 User thuộc về nhiều Organization, 1 Organization có nhiều User
+type Organization @entity {
+  id: ID!
+  name: String!
+  members: [User!]!
+}
+type User @entity {
+  id: ID!
+  name: String!
+  organizations: [Organization!]! @derivedFrom(field: "members")
+}
+=> Khi 1 Organization mới được thêm thì update id, name của O và member thì update id, name của U và organization lại quay về chính nó. đồng thời 1 instance U được sinh ra có id, name đó(nếu chưa được sinh ra) và trường organizations là 1 array các Organization sẽ add cái O đó vào
+=> Khi 1 U mới được thêm thì update id, name của U và organizations của nó k cần set nx
+Cách khác để tăng performance là:
+type Organization @entity {
+  id: ID!
+  name: String!
+  members: [UserOrganization]! @derivedFrom(field: "user")
+}
+type User @entity {
+  id: ID!
+  name: String!
+  organizations: [UserOrganization!] @derivedFrom(field: "organization")
+}
+type UserOrganization @entity {
+  id: ID!   # Set to `${user.id}-${organization.id}`
+  user: User!
+  organization: Organization!
+}
+=> NN là vì trong The Graph việc lưu 1 mảng rất tốn kém, cách này k hề lưu mảng vào store nên nhanh hơn
+VD ta muốn lấy organization of 1 user nào đó:
+query usersWithOrganizations {
+  users {
+    organizations { # this is a UserOrganization entity
+      organization {
+        name
+      }
+      "comment"
+    }
+  }
+}
+
+Tính năng filter(search) và rank các entities:
+type _Schema_
+  @fulltext(
+    name: "bandSearch",
+    language: en
+    algorithm: rank,
+    include: [
+      {
+        entity: "Band",
+        fields: [
+          { name: "name" },
+          { name: "description" },
+          { name: "bio" },
+        ]
+      }
+    ]
+  )
+type Band @entity {
+    id: ID!
+    name: String!
+    description: String!
+    bio: String
+    wallet: Address
+    labels: [Label!]!
+    discography: [Album!]!
+    members: [Musician!]!
+}
+=> nó hỗ trợ khá nhiều lang
+=> algorithm có 2 options "rank" là sắp xếp kết quả chỉ khi giống hoàn toàn và "proximityRank" bao gồm tất cả giống và gần giống
+=> VD này ta enable tính năng filter trên entity Band ở 3 trường name, description, bio. User search và trả ra các từ giống nhất xuất hiện qua trường bandSearch. VD:
+query {
+  bandSearch(text: "breaks & electro & detroit") {
+    id
+    name
+    description
+    wallet
+  }
+}
+
+AssemblyScript Mappings(mapping.ts): chuyển blockchain event thành entities xđ trong schema r lưu vào GraphNode. Ta phải viết mapping bằng typescript mà nói gọi là AssemblyScript. Script này sẽ compiled vào WASM(WebAssembly).
+Thực chất AssemblyScript kp là typescript mà nó chặt hơn, chỉ là cú pháp giống thôi.
+Ta viết các eventHandler nhận vào params là event đó
+Thường dùng các hàm này cho id: event.transaction.from.toHex(); event.transaction.hash.toHex(); event.logIndex.toString();
+1 số ít trường hợp các hàm readonly bị revert vì 1 lỗi nào đó thì ta dùng prefix try_ trước hàm để check như dưới:
+  let gravity = Gravity.bind(event.address)
+  let callResult = gravity.try_gravatarToOwner(gravatar)
+  if (callResult.reverted) {
+    log.info("getGravatar reverted", [])
+  } else {
+    let owner = callResult.value
+  }
+
+graph codegen [--output-dir <tên folder>]
+=> ta có thể call read-only method từ contract trong block đang xử lý. Command này cũng cho ta access vào event params và block và transaction mà phát ra cái event này bằng cách tạo ra 1 class for mọi contract event.
+=> folder này ở trong thư mục mặc định là generated: bên trong thì mỗi entity có 1 class riêng cung cấp type-safe mà ta dùng trong typescript phải xđ kiểu của từng var ấy, khả năng read và write vào entity, save function để write chính thức vào store
+=> ta phải codegen lại nếu có thay đổi trong schema, file config yaml, abi
+=> yarn build để compile và check lỗi trong file mapping.ts
+
+
+Các loại contract như registry, factory thì ta k thể tạo vô số subgraph or tạo vô số dataSource trong 1 subgraph để lấy hết dữ liệu của các graph con tạo ra từ factory được, khi đó phải dùng data source templates. Vd ở đây ta có dataSource của 1 factory contract:
+dataSources:
+  - kind: ethereum/contract
+    name: Factory
+    network: mainnet
+    source:
+      address: '0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95'
+      abi: Factory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      file: ./src/mappings/factory.ts
+      entities:
+        - Directory
+      abis:
+        - name: Factory
+          file: ./abis/factory.json
+      eventHandlers:
+        - event: NewExchange(address,address)
+          handler: handleNewExchange
+=> mỗi khi 1 contract NewExchange được tạo ra thì nó phát event cùng tên và ta xử lý lấy data bằng handleNewExchange
+Còn dataSource của Dynamically Created Contracts ta khai báo cũng trong yaml file đó:
+dataSources:
+  - kind: ethereum/contract
+    name: Factory
+    # ... other source fields for the main contract ...
+templates:
+  - name: Exchange
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Exchange
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.1
+      language: wasm/assemblyscript
+      file: ./src/mappings/exchange.ts
+      entities:
+        - Exchange
+      abis:
+        - name: Exchange
+          file: ./abis/exchange.json
+      eventHandlers:
+        - event: TokenPurchase(address,uint256,uint256)
+          handler: handleTokenPurchase
+        - event: EthPurchase(address,uint256,uint256)
+          handler: handleEthPurchase
+        - event: AddLiquidity(address,uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(address,uint256,uint256)
+          handler: handleRemoveLiquidity
+=> phần source ta k điền 1 địa chỉ cố định như bình thường tức là nó bắt event từ mọi address
+=> cái entities Exchange này ta cũng xử lý ở 1 file ts riêng trên cùng 1 subgraph. Khi codegen sẽ sinh ra templates và ta import để dùng
+import { Exchange } from '../generated/templates'
+Trên file mapping của contract Factory, ta dùng:
+export function handleNewExchange(event: NewExchange): void {
+  // Start indexing the exchange; `event.params.exchange` is the address of the new exchange contract
+  Exchange.create(event.params.exchange)
+}
+=> Mỗi khi có sự kiện NewExchange từ Factory thì ta tạo ra thêm 1 Exchange contract cần phải indexed thì gọi Exchange.create(address của contract exchange mới) => các contract tạo ra từ Factory đều giống nhau về code nên ta dùng chung 1 dataSource template và làm thêm cái bước create bên trên mà thôi. Còn đâu ta vẫn index như index 1 cái bình thường
+
+Có thể thêm Data Source Context để truyền thêm các config bổ sung vào riêng cái Exchange với dataSource là template đó:
+import { Exchange } from '../generated/templates'
+export function handleNewExchange(event: NewExchange): void {
+  let context = new DataSourceContext()
+  context.setString("tradingPair", event.params.tradingPair)
+  Exchange.createWithContext(event.params.exchange, context)
+}
+=> Ta lấy context trong exchange mapping ts:
+import { dataSource } from "@graphprotocol/graph-ts"
+let context = dataSource.context()
+let tradingPair = context.getString("tradingPair")
+
+Nhiều contract nó không dùng log để giảm gas cost nên dùng event k thể bắt được state change của blockchain => dùng callhandler: signature of function
+Nó dùng ethereum.call trong mapping handler để thực hiện call. Nó bắt hđ của contract datasource bằng proxy contract. 
+CallHanlder chỉ được kích hoạt khi hàm được gọi bởi người dùng or hàm là external và được gọi như 1 phần của function khác trong cùng contract
+Ganache và Rinkeby không hỗ trợ call handler vì k support Parity tracing API là cái mà handler phụ thuộc vào. VD:
+dataSources:
+  - kind: ethereum/contract
+    name: Gravity
+    network: mainnet
+    source:
+      address: '0x731a10897d267e19b34503ad902d0a29173ba4b1'
+      abi: Gravity
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      entities:
+        - Gravatar
+        - Transaction
+      abis:
+        - name: Gravity
+          file: ./abis/Gravity.json
+      callHandlers:
+        - function: createGravatar(string,string)
+          handler: handleCreateGravatar
+và trong mapping:
+import { CreateGravatarCall } from '../generated/Gravity/Gravity'
+import { Transaction } from '../generated/schema'
+export function handleCreateGravatar(call: CreateGravatarCall): void {
+  let id = call.transaction.hash.toHex()
+  let transaction = new Transaction(id)
+  transaction.displayName = call.inputs._displayName
+  transaction.imageUrl = call.inputs._imageUrl
+  transaction.save()
+}
+=> callHandler nhận param có type tương ứng với cái function
+=> CreateGravatarCall (which is a subclass of ethereum.Call and provided by @graphprotocol/graph-ts) ta có thể dùng call để lấy thông tin về transaction đó
+=> Tên sinh ra bằng codegen tuân thủ quy tắc VD hàm createGravatar thì codegen có type là CreateGravatarCall
+
+Block handler còn giúp ta xử lý mỗi khi 1 block mới sinh ra thì chạy function gì để update các entities or filter các block mới cx ok với:
+filter:
+  kind: call
+=> tức là chỉ tính block mới mà chứa call tới contract cần tính
+VD:
+dataSources:
+  - kind: ethereum/contract
+    name: Gravity
+    network: dev
+    source:
+      address: '0x731a10897d267e19b34503ad902d0a29173ba4b1'
+      abi: Gravity
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      entities:
+        - Gravatar
+        - Transaction
+      abis:
+        - name: Gravity
+          file: ./abis/Gravity.json
+      blockHandlers:
+        - handler: handleBlock
+        - handler: handleBlockWithCallToContract
+          filter:
+            kind: call
+Trong mapping:
+import { ethereum } from '@graphprotocol/graph-ts'
+export function handleBlock(block: ethereum.Block): void {
+  let id = block.hash.toHex()
+  let entity = new Block(id)
+  entity.save()
+}
+=> ethereum.block lưu thông tin về block bắt được 
+
+Subgraph còn xử lý được anonymous event với:
+eventHandlers:
+  - event: LogNote(bytes4,address,bytes32,bytes32,uint256,bytes)
+    topic0: "0xbaa8529c00000000000000000000000000000000000000000000000000000000"
+    handler: handleGive
+=> topic0 là hash của event signature mặc định. Nếu signature và topic0 khác nhau thì event k đc trigger
+
+Nhiều contract k lưu data trên blockchainn mà code trên đó lưu lại đường link còn data thực là trên ipfs cơ.
+import ipfs trên graph-ts
+const result = ipfs.cat(<hash>);
+if(result == null){handle error} else {
+  let data = json.fromBytes(result); 
+  data.toObject();
+=> nhưng thông thường ta k trust data nên dùng
+  let data = json.try_fromBytes(result);
+  if(data.error){...}
+}
+ipfs.map(hash, callback, userData);
+=> dùng cat và map để lấy data từ ipfs bằng việc cung vào IPFS hash. Thực tế bên trên ta check null vì IPFS khi lấy về có thể bị lỗi network hay gì đó mà k lấy được. Để đảm bảo data ipfs luôn lấy được và reliable thì có thể pin vào ipfs node mà Graph Node khi index subgraph connect vào tại https://api.thegraph.com/ipfs/(trên hosted service)
+
+Query bằng command:
+Cách khác paste vào Git bash là right click paste, tương tự right click copy
+C1: curl có sẵn window10
+Lỗi 1: X is not parameter -> remove-item alias:\curl -> là xongs
+Lỗi 2: vài query cơ bản thì được nhưng query với graph phải dùng git bash nó mới lấy được
+C2: http là package cài được trên mọi hệ điều hành giúp thao tác test API nhanh chóng
+=> python -m pip install --upgrade pip 
+=> pip install --upgrade pip setuptools pip install --upgrade httpie
+Cài bằng python cho dễ, cài như v là global luôn
+=> Dùng ez hơn curl, vd: http post " https://api.thegraph.com/subgraphs/name/hieucuopbien123/newsubgraph" query='{addressValues(first: 5) {
+>>     id
+>>     value
+>>     count
+>>   }
+>>   addresses(first: 5) {
+>>     id
+>>     timesChange
+>>     blockNumber
+>>     timestamp
+>>   }
+>> }' => vd trên VSC

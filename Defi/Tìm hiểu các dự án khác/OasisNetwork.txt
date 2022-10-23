@@ -1,0 +1,30 @@
+Oasis Network là 1 blockchain layer 1. Token ROSE. Dùng PoS, tổng cung giới hạn 10 tỷ.
+Đặc điểm: nó là 1 blockchain bình thường cho phép xây dựng các ứng dụng phi tập trung chỉ là riêng tư hơn, nhanh hơn, khả năng mở rộng cao hơn, bảo mật tốt. Để làm được v, nó có nhiều điểm khác biệt về cơ chế bảo mật cũng như tính năng khác mà các blockchain khác không có.
+
+Người dùng có thể stake data để nhận thưởng, gọi là tokenized data, các blockchain khác chỉ được stake token. Điều này dễ hiểu vì data cũng có giá trị như tiền. Data Provider stake data vào Oasis Network và nhận thưởng, Data Consumer trả phí và nhận về data
+
+Oasis có 2 thành phần kiến trúc chính tách biệt là:
+Consensus Layer: thực hiện bảo mật, pos, nó dùng SDK của Cosmos.
+Paratime Layer: là lớp phi tập trung cho phép bất cứ ai cũng có thể xây dựng được paratime của riêng họ. 
+=> Cái lớp paratime này cho phép khả năng mở rộng cao và hỗ trợ các nhu cầu tính toán chuyên biệt vì: nó lưu trữ nhiều thời gian chạy song song. Mỗi paratime đại diện cho 1 môi trường tính toán sao chép với trạng thái được chia sẻ. Bất cứ ai cũng có thể tạo ra paratime cho 1 mục đích chuyên biệt như paratime tính toán bí mật, paratime được cấp phép, EVM paratime,...; Paratime là nơi xử lý phần tính toán được tách biệt khỏi phần đồng thuận nên nhanh hơn, mà phần tính toán người dùng tạo ra tùy ý theo ý họ phục vụ cho riêng mục đích cụ thể nên khả năng mở rộng cao
+
+Các paratimme riêng tư người dùng tạo ra có thể viết các ứng dụng trên đó, tạo ra các smart contract riêng tư. Nó mở ra các TH sử dụng mới như private lending, private AMM,.. với khả năng mở rộng cao vì người dùng có thể tùy ý chỉnh sửa paratime phù hợp với nhu cầu ứng dụng của mình như lớn hay nhỏ, mở hay đóng, chỉ mở cửa vào 1 khung giờ cụ thể chẳng hạn.
+=> Thêm nhiều tính năng thú vị vào blockchain trong khi chỉ cần duy trì cái cốt lõi là sổ cái đồng thuận. 
+Các paratime chạy song song nhau
+Phí chắc chắn thấp hơn ethereum và bitcoin. 
+
+Token ROSE: dùng làm phí giao dịch, staking hay delegator tại lớp đồng thuận; dùng trả thưởng cho các staker và delegator để bảo mật cho mạng lưới
+
+rose.fi là 1 smart contract trên Aura, k liên quan gì đến oasis, chỉ là trùng token ROSE mà thôi
+
+Oasis tạo ra nền kinh tế dữ liệu có trách nhiệm đầu tiên.
+Việc tách biệt đồng thuận và thực thi thành 2 lớp cho phép nhiều paratime xử lý các giao dịch song song làm cho khối lượng công việc phức tạp được xử lý trên 1 paratime không làm chậm các giao dịch nhanh hơn được xử lý trên 1 paratime khác
+Tính năng phát hiện giả mạo tinh vi trong oasis hiệu quả hơn sharding và parachain
+
+Mạng oasis thiết kế ra paratime bảo mật đầu tiên với sự hỗ trợ của các smart contract bảo mật. Paratime đó sử dụng công nghệ tính toán là TEE(môi trường thực thi đáng tin cậy)
+TEE hoạt động như 1 hộp đen giả định, dữ liệu mã hóa đi vào hộp đen cùng với smart contract và được giải mã, xử lý bởi smart contract và được mã hóa trở lại trước khi gửi ra ngoài TEE. Từ bên ngoài thì dữ liệu luôn trong trạng thái mã hóa nên được bảo mật và kbh rò rỉ. Có thể dùng nó với các thông tin cần bảo mật như dữ liệu sức khỏe cá nhân nhạy cảm, số an sinh xh, sao kê ngân hàng.
+Encrypted data + smart contract -> Secure enclave -> Encrypted Result
+
+VD: Nền tảng cryptosafe được phát triển bởi Oasis Labs và Binance cho phép các sàn giao dịch chia sẻ dữ liệu 1 cách bí mật giữa các sàn giao dịch về các mối đe dọa từ các cuộc tấn công
+VD: 1 nhà cung cấp dịch vụ chăm sóc sức khỏe muốn chia sẻ dữ liệu với bên thứ 3 trong khi vẫn giữ quyền kiểm soát dữ liệu và bảo vệ tính bí mật của dữ liệu bệnh nhân. Sử dụng API do Oasis Labs xd, công ty chăm sóc sức khỏe có thể quản lý, theo dõi, kiểm soát tất cả việc sử dụng dữ liệu ngay cả khi được chia sẻ với bên thứ 3, chứ kp chia sẻ ra là mất quyền kiểm soát data
+Vd: Công ty muốn cho người dùng kiểm soát dữ liệu di truyền của họ, nhờ oasis, khách hàng có thể giữ quyền sở hữu dữ liệu bộ gen của họ và công ty có thể phân tích dữ liệu mà k cần xem thông tin thô của khách hàng

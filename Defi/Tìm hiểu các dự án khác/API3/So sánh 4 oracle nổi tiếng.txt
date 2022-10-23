@@ -1,0 +1,24 @@
+ChainLink: Data Provider -> Oracle Nodes -> chuỗi tổng hợp -> data consumers
+Band Protocol: Data Provider -> BandChain: Nodes/Validators (có delegator) -> chuỗi tổng hợp -> data consumers
+Pyth: Data Provider -> chuỗi tổng hợp (có curator và delegator trong Solana) -> data consumers
+API3: Data Provider -> chuỗi tổng hợp -> data consumers
+
+API3 và Pyth ra đời sau và cho phép data provider truyền thẳng vào chuỗi tổng hợp mà không cần qua oracle nodes trung gian như 2 dự án trước đó.
+Data Provider có thể cung dữ liệu free or fee. 1 ví dụ về nhà cung cấp dữ liệu free là CoinGecko.
+
+Các node của Band Protocol vận hàng 1 chuỗi khối riêng biệt BandChain. Nó có tập hợp các Validataor riêng cho mình để đồng thuận nx. Còn Chainlink thì tương tự nhưng các node không vận hành 1 chuỗi khối riêng mà các node sẽ liên kết với nhau tạo thành mạng P2P off-chain DONs. Nó có nhiều nhóm chạy node riêng biệt với quy mô khác nhau, cung cấp dữ liệu khác nhau cho các chuỗi khác nhau. Mõi chuỗi có 1 lượng node riêng như ETH, BSC, Matic, xDai.
+Với chainlink có 2 hình thức tổng hợp dữ liệu là tổng hợp trên chuỗi FluxAggregator(FL) hoặc offchain(OCR). Với FL thì mỗi nút oracle cần trả tiền gas khi họ gửi giá của mình cho hợp đồng trên chuỗi. Với OCR thì chỉ 1 giá tổng hợp duy nhất được gửi lên chuỗi, về cơ bản thay vì có 21 node oracle đều phải trả tiền gas, chỉ cần 1 node theo phương pháp OCR. FL là hình thức phổ biến nhất là trên các chuỗi có chi phí gas thấp.
+
+Doanh thu đến từ: người dùng trả phí để sử dụng dữ liệu; phần thưởng mã thông báo
+Chi phí đến từ: chi phí vận hành node; trả tiền gas theo từng chuỗi riêng; trả tiền cho data provider. Khi khí gas trên chuỗi tăng quá lớn dẫn đến các node chainlink có thể lỗ do chi phí luôn cao hơn doanh thu
+
+Pyth, API3 tiếp cận theo cách khác, loại bỏ các node oracle kiểu chainlink nằm trung gian ở giữa, yêu cầu data provider trực tiếp gửi data lên chuỗi tông hợp. Điều này giúp loại bỏ bên thứ 3, các data provider sẽ nhận nhiều tiền hơn do không phải san sẻ với các node. 
+Pyth tổng hợp data trên chuỗi Solana. Chi phí cực rẻ và tốc độ cao nên lợi nhuận cao. Nhưng điều quan trọng là truyền thông từ Solana đến cac chuỗi khác, nơi có nhu cầu sử dụng dữ liệu. Pyth dùng Wormhole để làm điều này.
+API3 cũng tương tự nhưng người dùng trả phí gas chứ kp provider. Nó k có tổng hợp ngoài chuỗi nên user cần thành toán cho mỗi đơn phí gas của data provider. Phía cung giảm chi phí nhưng phía cầu bị tổn hại. 
+
+Về bảo mật, do oracle được rất nhiều các mảng ghép defi dùng tới và giá trị có thể lên tới chục tỷ đô la. Để giải quyết vấn đề bảo mật, thông thường ta cho họ đặt cược và phạt data không chính xác nhưng trong oracle thì nhu cầu phụ thuộc vào nó quá nhiều với số tiền khổng lồ và không ai có thể cược 1 khoản khổng lồ như v. Đây là vấn đề khó đối với oracle đòi hỏi sự tin tưởng vào các thợ đào và validator. Các hình thức vẫn cho đặt cọc để khuyến khích chứ k thể bảo mật hoàn toàn. Còn pyth và api3 tốt hơn khi mà nhà cung dữ liệu đặt chính uy tín của họ lên hàng đầu. Họ trực tiếp cung vào chuỗi tổng hợp, càng nhiều người dùng dùng của họ thì uy tín họ càng xây dựng lớn dần theo thời gian.
+Ngược lại thì Chainlink cac node hoàn toàn ẩn danh thì lòng tin càng khó. Tuy nhiên các giải pháp khác như DECO và Town Crier của Chainlink ghi trong sách trắng v2 cho phép bên thứ 3 chứng minh họ không can thiệp vào dữ liệu từ nguồn.
+
+Khi có thông tin sai lệch xảy ra, người dùng là những người bị thiệt hại. Với chainlink v2 thì nó sử dụng khoản phạt của node oracle đền bù cho user sử dụng. Pyth thì các data provider đặt cọc. API3 thì data provider cần đặt cọc, họ chả bị phạt gì khi cung cấp thông tin sai. Họ không cần có token API3 khi provide data. 
+
+Chainlink họ phải mua LINK token để khóa data để họ cung. Bên cạnh việc lỗ hay lãi vì phí gas thì họ còn gặp vấn đề về giá token LINK giảm làm ảnh hưởng giá trị họ mua để đặt cọc. Chainlink để giải quyết tình trạng này đã phải cung 35% token khuyến khích người dùng để dành riêng cho việc này.
